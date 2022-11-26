@@ -2,40 +2,46 @@ import React, { FC, memo, useState } from "react";
 
 type FolderProps = {
   data: any;
+  handleInsertNode: any;
+  handleDeleteNode: any;
 };
 
-const Folder: FC<FolderProps> = ({ data }) => {
+const Folder: FC<FolderProps> = ({
+  data,
+  handleInsertNode,
+  handleDeleteNode,
+}) => {
   const [clicked, setClicked] = useState(false);
-  const [newData, setNewData] = useState(data);
   const [addNew, setAddNew] = useState({
     isOpen: false,
     isFolder: true,
-    name: "",
   });
-  console.log(newData);
 
   const handleKeyDown = (e: any) => {
     if (e.keyCode === 13) {
-      setNewData({
-        ...newData,
-        items: [...(newData.items ?? []), { ...addNew }],
-      });
+      handleInsertNode(data.id, e.target.value, addNew.isFolder);
       setAddNew({
         isOpen: false,
         isFolder: true,
-        name: "",
       });
     }
   };
+  const handleDelete = () => {
+    handleDeleteNode(data.id);
+  };
+  const renderDelete = () => {
+    return <button onClick={handleDelete}>Delete</button>;
+  };
 
-  if (newData.isFolder) {
+  if (data.isFolder) {
     return (
       <div>
-        <span className="flex bg-orange-400  w-60 h-10 m-9  justify-between cursor-pointer ">
+        <span className="flex bg-orange-400  w-96 h-10 m-9  justify-between cursor-pointer ">
           <div className="font-bold w-1/2" onClick={() => setClicked(!clicked)}>
-            📁{newData.name}
+            📁{data.name}
           </div>
           <button
+            disabled={addNew.isOpen && addNew.isFolder}
             onClick={() => {
               setAddNew({ ...addNew, isOpen: !addNew.isOpen, isFolder: true });
               setClicked(true);
@@ -45,6 +51,7 @@ const Folder: FC<FolderProps> = ({ data }) => {
             +folder
           </button>
           <button
+            disabled={addNew.isOpen && !addNew.isFolder}
             onClick={() => {
               setAddNew({ ...addNew, isOpen: !addNew.isOpen, isFolder: false });
               setClicked(true);
@@ -53,34 +60,41 @@ const Folder: FC<FolderProps> = ({ data }) => {
           >
             +file
           </button>
+          {renderDelete()}
         </span>
 
         {addNew.isOpen && (
           <div className="pl-10 ">
             {addNew.isFolder ? "📁" : "📄"}
             <input
-              value={addNew.name}
-              onChange={(e) => setAddNew({ ...addNew, name: e.target.value })}
+              type={"text"}
               className="outline-none p-1 rounded-md"
               onKeyDown={handleKeyDown}
               autoFocus
-              onBlur={() => setAddNew({ ...addNew, isOpen: false, name: "" })}
+              onBlur={() => setAddNew({ ...addNew, isOpen: false })}
             />
           </div>
         )}
         <div className="pl-10 ">
           {clicked &&
-            (newData.items ?? []).map((itm: any) => <Folder data={itm} />)}
+            (data.items ?? []).map((itm: any) => (
+              <Folder
+                key={itm.id}
+                handleDeleteNode={handleDeleteNode}
+                handleInsertNode={handleInsertNode}
+                data={itm}
+              />
+            ))}
         </div>
       </div>
     );
-  } else {
+  } else if (data.name) {
     return (
-      <div className=" p-1 pl-6 bg-slate-300 rounded-br-md w-60 h-8 m-9 font-bold">
-        📄{newData.name}
+      <div className=" p-1 pl-6 flex justify-between bg-slate-300  w-60 h-8 m-9">
+        <span className=" font-bold"> 📄{data.name}</span> {renderDelete()}
       </div>
     );
-  }
+  } else return <></>;
 };
 
 Folder.defaultProps = {};
