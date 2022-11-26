@@ -4,7 +4,7 @@ import FolderWrapperClassBased from "./my-apps/file-explorer/components/FolderWr
 function App() {
   return (
     <div>
-      <FolderWrapperClassBased />
+      <FolderWrapper />
     </div>
   );
 }
