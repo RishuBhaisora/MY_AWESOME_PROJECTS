@@ -4,18 +4,21 @@ type FolderProps = {
   data: any;
   handleInsertNode: any;
   handleDeleteNode: any;
+  handleEditNode: any;
 };
 
 const Folder: FC<FolderProps> = ({
   data,
   handleInsertNode,
   handleDeleteNode,
+  handleEditNode,
 }) => {
   const [clicked, setClicked] = useState(false);
   const [addNew, setAddNew] = useState({
     isOpen: false,
     isFolder: true,
   });
+  const [isEdit, setIsEdit] = useState(false);
 
   const handleKeyDown = (e: any) => {
     if (e.keyCode === 13) {
@@ -29,14 +32,41 @@ const Folder: FC<FolderProps> = ({
   const handleDelete = () => {
     handleDeleteNode(data.id);
   };
+  const handleEdit = (e: any) => {
+    if (e.keyCode === 13) {
+      handleEditNode(data.id, e.target.value);
+    }
+  };
   const renderDelete = () => {
     return <button onClick={handleDelete}>Delete</button>;
+  };
+  const renderEdit = () => {
+    return <button onClick={() => setIsEdit(!isEdit)}>EDIT</button>;
+  };
+  const renderInput = () => {
+    if (addNew.isOpen || isEdit) {
+      return (
+        <div className="pl-10 ">
+          {addNew.isFolder ?? isEdit ? "📁" : "📄"}
+          <input
+            type={"text"}
+            className="outline-none p-1 rounded-md"
+            onKeyDown={isEdit ? handleEdit : handleKeyDown}
+            autoFocus
+            onBlur={() => {
+              setIsEdit(false);
+              setAddNew({ ...addNew, isOpen: false });
+            }}
+          />
+        </div>
+      );
+    }
   };
 
   if (data.isFolder) {
     return (
       <div>
-        <span className="flex bg-orange-400  w-96 h-10 m-9  justify-between cursor-pointer ">
+        <span className="flex bg-orange-400  w-1/2 h-10 m-9  justify-between cursor-pointer ">
           <div className="font-bold w-1/2" onClick={() => setClicked(!clicked)}>
             📁{data.name}
           </div>
@@ -60,21 +90,11 @@ const Folder: FC<FolderProps> = ({
           >
             +file
           </button>
-          {renderDelete()}
-        </span>
 
-        {addNew.isOpen && (
-          <div className="pl-10 ">
-            {addNew.isFolder ? "📁" : "📄"}
-            <input
-              type={"text"}
-              className="outline-none p-1 rounded-md"
-              onKeyDown={handleKeyDown}
-              autoFocus
-              onBlur={() => setAddNew({ ...addNew, isOpen: false })}
-            />
-          </div>
-        )}
+          {renderDelete()}
+          {renderEdit()}
+        </span>
+        {renderInput()}
         <div className="pl-10 ">
           {clicked &&
             (data.items ?? []).map((itm: any) => (
@@ -82,6 +102,7 @@ const Folder: FC<FolderProps> = ({
                 key={itm.id}
                 handleDeleteNode={handleDeleteNode}
                 handleInsertNode={handleInsertNode}
+                handleEditNode={handleEditNode}
                 data={itm}
               />
             ))}

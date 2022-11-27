@@ -6,13 +6,15 @@ const useTraverseTree: any = () => {
     isFolder: boolean
   ) {
     if (tree.id === folderId && tree.isFolder) {
-      tree.items.unshift({
+      const newItems = [...tree.items];
+      newItems.unshift({
         id: new Date().getTime(),
         name: item,
         isFolder,
         items: [],
       });
-      return tree;
+
+      return { ...tree, items: newItems };
     }
 
     const latestNode = tree.items.map((itm: any) => {
@@ -29,7 +31,16 @@ const useTraverseTree: any = () => {
     });
     return { ...tree, items: latestNode };
   }
-  return { insertNode, deleteNode };
+  function editNode(tree: any, idToEdit: number, item: string) {
+    if (idToEdit === tree.id) {
+      return { ...tree, name: item };
+    }
+    const latestNode = tree.items.map((itm: any) => {
+      return editNode(itm, idToEdit, item);
+    });
+    return { ...tree, items: latestNode };
+  }
+  return { insertNode, deleteNode, editNode };
 };
 
 export default useTraverseTree;

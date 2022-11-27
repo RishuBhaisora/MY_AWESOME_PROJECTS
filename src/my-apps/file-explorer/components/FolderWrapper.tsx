@@ -7,15 +7,19 @@ type FolderWrapperProps = {};
 
 const FolderWrapper: FC<FolderWrapperProps> = (props) => {
   const [explorerData, setExplorerData] = useState(data);
-  const { insertNode, deleteNode } = useTraverseTree();
+
+  const { insertNode, deleteNode, editNode } = useTraverseTree();
   const handleInsertNode = (folderId: string, item: any, isFolder: boolean) => {
     const finalTree = insertNode(explorerData, folderId, item, isFolder);
+
     setExplorerData(finalTree);
   };
   const handleDeleteNode = (idToDelete: string) => {
     const finalTree = deleteNode(explorerData, idToDelete);
-    console.log(finalTree);
-
+    setExplorerData(finalTree);
+  };
+  const handleEditNode = (idToEdit: string, item: string) => {
+    const finalTree = editNode(explorerData, idToEdit, item);
     setExplorerData(finalTree);
   };
   if (Object.keys(explorerData).length > 2) {
@@ -25,6 +29,7 @@ const FolderWrapper: FC<FolderWrapperProps> = (props) => {
           key={explorerData.id}
           handleInsertNode={handleInsertNode}
           handleDeleteNode={handleDeleteNode}
+          handleEditNode={handleEditNode}
           data={explorerData}
         />
       </div>
