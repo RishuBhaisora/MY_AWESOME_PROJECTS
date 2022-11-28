@@ -1,6 +1,4 @@
 const useTraverseTree: any = () => {
-  console.log("i am called");
-
   function insertNode(
     tree: any,
     folderId: number,
