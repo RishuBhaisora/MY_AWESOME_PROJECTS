@@ -1,7 +1,10 @@
 import React, { Component } from "react";
 
 export interface FolderClassBasedProps {
+  handleInsertNode: any;
   data: any;
+  handleEditNode: any;
+  handleDeleteNode: any;
 }
 export interface FolderClassBasedState {
   clicked: boolean;
@@ -32,12 +35,11 @@ class FolderClassBased extends Component<
 
   handleKeyDown(e: any) {
     if (e.keyCode === 13) {
-      this.setState((state) => ({
-        newData: {
-          ...state.newData,
-          items: [...(state.newData.items ?? []), { ...state.addNew }],
-        },
-      }));
+      this.props.handleInsertNode(
+        this.props.data.id,
+        e.target.value,
+        this.state.addNew.isFolder
+      );
       this.setAddNew("", false);
     }
   }
@@ -61,7 +63,7 @@ class FolderClassBased extends Component<
   render() {
     const isOpen = this.state.addNew.isOpen;
     const addNew = this.state.addNew;
-    const newData = this.state.newData;
+    const newData = this.props.data;
     if (newData.isFolder) {
       return (
         <div>
@@ -110,7 +112,13 @@ class FolderClassBased extends Component<
           <div className="pl-10 ">
             {this.state.clicked &&
               (newData.items ?? []).map((itm: any) => (
-                <FolderClassBased data={itm} />
+                <FolderClassBased
+                  key={itm.id}
+                  handleDeleteNode={this.props.handleDeleteNode}
+                  handleEditNode={this.props.handleDeleteNode}
+                  handleInsertNode={this.props.handleInsertNode}
+                  data={itm}
+                />
               ))}
           </div>
         </div>
